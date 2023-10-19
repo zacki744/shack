@@ -60,15 +60,6 @@ inline void Board::draw(sf::RenderWindow& window, sf::Font font)
                 square.setFillColor(sf::Color(209, 139, 71));   // Dark square
             }
             window.draw(square);
-            // Draw piece values
-            char piece = this->chessboard[row][col];
-            if (piece != ' ')
-            {
-                sf::Text pieceText(piece, font, 24);
-                pieceText.setPosition(col * tileSize + 10, row * tileSize + 10);
-                pieceText.setFillColor(piece >= 'a' && piece <= 'z' ? sf::Color::White : sf::Color::Black);
-                window.draw(pieceText);
-            }
         }
     }
     if (this->Leagal_moves.size() != 0) {
@@ -82,6 +73,18 @@ inline void Board::draw(sf::RenderWindow& window, sf::Font font)
                 square.setFillColor(sf::Color(9, 39, 71));   // Dark square
             }
             window.draw(square);
+        }
+    }
+    for (int row = 0; row < 8; row++) {
+        for (int col = 0; col < 8; col++) {
+            char piece = this->chessboard[row][col];
+            if (piece != ' ')
+            {
+                sf::Text pieceText(piece, font, 24);
+                pieceText.setPosition(col * tileSize + 10, row * tileSize + 10);
+                pieceText.setFillColor(piece >= 'a' && piece <= 'z' ? sf::Color::White : sf::Color::Black);
+                window.draw(pieceText);
+            }
         }
     }
 }

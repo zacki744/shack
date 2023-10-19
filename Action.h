@@ -63,6 +63,10 @@ inline bool Action::isReady() const
 
 inline void Action::execute(Board& b)
 {
+    if (startRow == destRow && startCol == destCol) {
+        b.empty_moves();
+        return;
+    }
     if (ready)
     {
         b.move_pice(startRow, startCol, destRow, destCol);

@@ -6,10 +6,24 @@ private:
     static void Rook_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
         // Rook can move horizontally (left and right) and vertically (up and down)
         std::vector<std::vector<char>> board = b.Get_board();
+        int upper;
+        int lower;
         // Check to the right
+        if (board[row][col] > 'a' && board[row][col] < 'z') {
+            upper = 'Z';
+            lower = 'A';
+        }
+        else {
+            upper = 'z';
+            lower = 'a';
+        }
         for (int i = col + 1; i < 8; i++) {
             if (board[row][i] == ' ') {
                 res.push_back(std::make_pair(row, i));
+            }
+            else if (board[row][i] > lower && board[row][i] < upper) {
+                res.push_back(std::make_pair(row, i));
+                break;
             }
             else {
                 break; // Stop if there's a piece in the way
@@ -21,6 +35,10 @@ private:
             if (board[row][i] == ' ') {
                 res.push_back(std::make_pair(row, i));
             }
+            else if (board[row][i] > lower && board[row][i] < upper) {
+                res.push_back(std::make_pair(row, i));
+                break;
+            }
             else {
                 break; // Stop if there's a piece in the way
             }
@@ -31,6 +49,10 @@ private:
             if (board[i][col] == ' ') {
                 res.push_back(std::make_pair(i, col));
             }
+            else if (board[i][col] > lower && board[i][col] < upper) {
+                res.push_back(std::make_pair(i, col));
+                break;
+            }
             else {
                 break; // Stop if there's a piece in the way
             }
@@ -40,6 +62,10 @@ private:
         for (int i = row + 1; i < 8; i++) {
             if (board[i][col] == ' ') {
                 res.push_back(std::make_pair(i, col));
+            }
+            else if (board[i][col] > lower && board[i][col] < upper) {
+                res.push_back(std::make_pair(i, col));
+                break;
             }
             else {
                 break; // Stop if there's a piece in the way
@@ -58,32 +84,7 @@ public:
         char target = board[toY][toX];
 
         // Implement your logic for checking if the move is legal
-        // You need to consider the rules for each chess piece here
-
-        // Example for a pawn:
-        // if (piece == 'P' && fromX == toX && fromY - toY == 1 && target == ' ') {
-        //     return true;
-        // }
-        // Pawn
-        if (piece == 'P') 
-        {
-            if (fromX == toX && fromY - toY == 1 && target == ' ') {
-
-                 return true;
-            }
-        }
-        if (piece == 'p') 
-        {
-            if (fromX == toX && fromY - toY == 1 && target == ' ') {
-                return true;
-            }
-        }
-        // Rook
-        if (piece == 'R') {
-
-        }
-        if (piece == 'R')
-
+        // You need to consider the rules for each chess piece her
         // horse
         // Rook
         // Queen
@@ -107,11 +108,29 @@ public:
         case 'P':
             if (b.Get_board()[row + 1][col] == ' ') {
                 res.push_back(std::make_pair(row + 1, col));
+                if (row == 1 && b.Get_board()[row + 2][col] == ' ') {
+                    res.push_back(std::make_pair(row + 2, col));
+                }
+            }
+            if (board[row + 1][col + 1] > 'a' && board[row + 1][col + 1] < 'z') {
+                res.push_back(std::make_pair(row + 1, col + 1));
+            }
+            if (board[row + 1][col - 1] > 'a' && board[row + 1][col - 1] < 'z') {
+                res.push_back(std::make_pair(row + 1, col - 1));
             }
             break;
         case 'p':
             if (b.Get_board()[row - 1][col] == ' ') {
                 res.push_back(std::make_pair(row - 1, col));
+                if (row == 6 && b.Get_board()[row - 2][col] == ' ') {
+                    res.push_back(std::make_pair(row - 2, col));
+                }
+            }
+            if (board[row - 1][col + 1] > 'A' && board[row - 1][col + 1] < 'Z') {
+                res.push_back(std::make_pair(row - 1, col + 1));
+            }
+            if (board[row - 1][col - 1] > 'A' && board[row - 1][col - 1] < 'Z') {
+                res.push_back(std::make_pair(row -1, col - 1));
             }
             break;
         case 'R':
