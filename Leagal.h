@@ -72,6 +72,79 @@ private:
             }
         }
     }
+    static void Bishop_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
+        // Rook can move horizontally (left and right) and vertically (up and down)
+        std::vector<std::vector<char>> board = b.Get_board();
+        int upper;
+        int lower;
+        if (board[row][col] > 'a' && board[row][col] < 'z') {
+            upper = 'Z';
+            lower = 'A';
+        }
+        else {
+            upper = 'z';
+            lower = 'a';
+        }
+        int c_row = row++;
+        // right down diagonal
+        for (int i = col + 1; i < 8; i++) {
+            if (board[c_row][i] == ' ') {
+                res.push_back(std::make_pair(c_row, i));
+            }
+            else if (board[c_row][i] > lower && board[c_row][i] < upper) {
+                res.push_back(std::make_pair(c_row, i));
+                break;
+            }
+            else {
+                break; // Stop if there's a piece in the way
+            }
+            c_row++;
+        }
+
+        // Check to the left up diagonal
+        c_row = row--;
+        for (int i = col - 1; i >= 0; i--) {
+            if (board[c_row][i] == ' ') {
+                res.push_back(std::make_pair(c_row, i));
+            }
+            else if (board[c_row][i] > lower && board[c_row][i] < upper) {
+                res.push_back(std::make_pair(c_row, i));
+                break;
+            }
+            else {
+                break; // Stop if there's a piece in the way
+            }
+            c_row--;
+        }
+
+        // Check upwards
+        for (int i = row - 1; i >= 0; i--) {
+            if (board[i][col] == ' ') {
+                res.push_back(std::make_pair(i, col));
+            }
+            else if (board[i][col] > lower && board[i][col] < upper) {
+                res.push_back(std::make_pair(i, col));
+                break;
+            }
+            else {
+                break; // Stop if there's a piece in the way
+            }
+        }
+
+        // Check downwards
+        for (int i = row + 1; i < 8; i++) {
+            if (board[i][col] == ' ') {
+                res.push_back(std::make_pair(i, col));
+            }
+            else if (board[i][col] > lower && board[i][col] < upper) {
+                res.push_back(std::make_pair(i, col));
+                break;
+            }
+            else {
+                break; // Stop if there's a piece in the way
+            }
+        }
+    }
 
 public:
     static bool isMoveLegal(std::vector<std::vector<char>>& board, int fromX, int fromY, int toX, int toY) {
@@ -133,17 +206,30 @@ public:
                 res.push_back(std::make_pair(row -1, col - 1));
             }
             break;
-        case 'R':
+        case 'R' || 'r':
             Rook_moves(res, b, col, row);
             break;
-        case 'r':
-            Rook_moves(res, b, col, row);
+        case 'B':
+            Bishop_moves(res, b, col, row);
+            break;
+        case 'b':
+            Bishop_moves(res, b, col, row);
+            break;
+        case 'N':
+            break;
+        case 'n':
+            break;
+        case 'Q':
+            break;
+        case 'q':
+            break;
+        case 'k':
+            break;
+        case 'K':
+            break;
 
-            break;
         }
-        // Rook
         // horse
-        // Rook
         // Queen
         // King
     }
