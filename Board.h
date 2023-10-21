@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 class Board
 {
@@ -12,6 +13,7 @@ public:
     void move_pice(int startRow, int startCol, int destRow, int destCol);
     void Set_Leagal_moves(std::vector<std::pair<int, int>> res);
     void empty_moves();
+    std::vector<std::pair<int, int>> Get_Leagal_moves();
 
 
 private:
@@ -108,6 +110,11 @@ inline void Board::move_pice(int startRow, int startCol, int destRow, int destCo
 inline void Board::Set_Leagal_moves(std::vector<std::pair<int, int>> res)
 {
     this->Leagal_moves = res;
+}
+
+inline std::vector<std::pair<int, int>> Board::Get_Leagal_moves()
+{
+    return this->Leagal_moves;
 }
 
 inline void Board::empty_moves()

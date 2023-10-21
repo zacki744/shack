@@ -10,7 +10,7 @@ public:
     std::vector<std::pair<int, int>> setPieceToMove(int piece, int row, int col, Board& b);
 
     // Set the destination square for the piece.
-    void setDestinationSquare(int row, int col);
+    void setDestinationSquare(int row, int col, Board& b);
 
     // Check if an action is ready to be executed.
     bool isReady() const;
@@ -38,22 +38,38 @@ inline Action::Action()
 
 inline std::vector<std::pair<int, int>> Action::setPieceToMove(int piece, int row, int col, Board& b)
 {
+    b.empty_moves();
     std::vector<std::pair<int, int>> res;
     L.getPossibleMoves(b, col, row, res);
     if (res.size() != 0)
         b.Set_Leagal_moves(res);
-    //std::cout << res[0].first << std::endl;
-    pieceToMove = piece;
-    startRow = row;
-    startCol = col;
+    this->pieceToMove = piece;
+    this->startRow = row;
+    this->startCol = col;
     return res;
 }
 
-inline void Action::setDestinationSquare(int row, int col)
+inline void Action::setDestinationSquare(int row, int col, Board& b)
 {
-    destRow = row;
-    destCol = col;
-    ready = true;
+    if (this->startRow == this->destRow && this->startCol == this->destCol) {
+        this->pieceToMove = ' ';
+        this->startRow = -1;
+        this->startCol = -1;
+        this->destRow = -1;
+        this->destCol = -1;
+        this->ready = false;
+        b.empty_moves();
+        return;
+    }
+    std::vector<std::pair<int, int>> moves = b.Get_Leagal_moves();
+    for (const auto& move : moves) {
+        if (move.first == row && move.second == col) {
+            this->destRow = row;
+            this->destCol = col;
+            this->ready = true;
+            return; // Exit the loop and function when a valid move is found
+        }
+    }
 }
 
 inline bool Action::isReady() const
@@ -63,7 +79,7 @@ inline bool Action::isReady() const
 
 inline void Action::execute(Board& b)
 {
-    if (startRow == destRow && startCol == destCol) {
+    if (this->startRow == this->destRow && this->startCol == this->destCol) {
         b.empty_moves();
         return;
     }

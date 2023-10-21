@@ -3,6 +3,94 @@
 
 class Legal {
 private:
+    
+    static void King_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
+        // Rook can move horizontally (left and right) and vertically (up and down)
+        std::vector<std::vector<char>> board = b.Get_board();
+        int upper;
+        int lower;
+        // Check to the right
+        if (board[row][col] > 'a' && board[row][col] < 'z') {
+            upper = 'Z';
+            lower = 'A';
+        }
+        else {
+            upper = 'z';
+            lower = 'a';
+        }
+        // Define possible king moves (relative to the current position)
+        int moves[8][2] = {
+            {-1, -1}, {-1, 0}, {-1, 1},
+            {0, -1}, {0, 1},
+            {1, -1}, {1, 0}, {1, 1}
+        };
+
+        for (int i = 0; i < 8; i++) {
+            int newRow = row + moves[i][0];
+            int newCol = col + moves[i][1];
+
+            if (newRow >= 0 && newRow <= 7 && newCol >= 0 && newCol <= 7) {
+                if (board[newRow][newCol] == ' ' || (board[newRow][newCol] > lower && board[newRow][newCol] < upper)) {
+                    res.push_back(std::make_pair(newRow, newCol));
+                }
+            }
+        }
+    }
+    static void Knight_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
+        // Rook can move horizontally (left and right) and vertically (up and down)
+        std::vector<std::vector<char>> board = b.Get_board();
+        int upper;
+        int lower;
+        // Check to the right
+        if (board[row][col] > 'a' && board[row][col] < 'z') {
+            upper = 'Z';
+            lower = 'A';
+        }
+        else {
+            upper = 'z';
+            lower = 'a';
+        }
+        if (row + 2 <= 7 && col + 1 <= 7) {
+            if (board[row + 2][col + 1] == ' ' || (board[row + 2][col + 1] > lower && board[row + 2][col + 1] < upper)) {
+                res.push_back(std::make_pair(row + 2, col + 1));
+            }
+        }
+        if (row + 2 <= 7 && col - 1 >= 0) {
+            if (board[row + 2][col - 1] == ' ' || (board[row + 2][col - 1] > lower && board[row + 2][col - 1] < upper)) {
+                res.push_back(std::make_pair(row + 2, col - 1));
+            }
+        }
+        if (row - 2 >= 0 && col - 1 >= 0) {
+            if (board[row - 2][col - 1] == ' ' || (board[row - 2][col - 1] > lower && board[row - 2][col - 1] < upper)) {
+                res.push_back(std::make_pair(row - 2, col - 1));
+            }
+        }
+        if (row - 2 >= 0 && col + 1 <= 7) {
+            if (board[row - 2][col + 1] == ' ' || (board[row - 2][col + 1] > lower && board[row - 2][col + 1] < upper)) {
+                res.push_back(std::make_pair(row - 2, col + 1));
+            }
+        }
+        if (row - 1 >= 0 && col + 2 <= 7) {
+            if (board[row - 1][col + 2] == ' ' || (board[row - 1][col + 2] > lower && board[row - 1][col + 2] < upper)) {
+                res.push_back(std::make_pair(row - 1, col + 2));
+            }
+        }
+        if (row + 1 <= 7 && col + 2 <= 7) {
+            if (board[row + 1][col + 2] == ' ' || (board[row + 1][col + 2] > lower && board[row + 1][col + 2] < upper)) {
+                res.push_back(std::make_pair(row + 1, col + 2));
+            }
+        }
+        if (row - 1 >= 0 && col - 2 >= 0) {
+            if (board[row - 1][col - 2] == ' ' || (board[row - 1][col - 2] > lower && board[row - 1][col - 2] < upper)) {
+                res.push_back(std::make_pair(row - 1, col - 2));
+            }
+        }
+        if (row + 1 <= 7 && col - 2 >= 0) {
+            if (board[row + 1][col - 2] == ' ' || (board[row + 1][col - 2] > lower && board[row + 1][col - 2] < upper)) {
+                res.push_back(std::make_pair(row + 1, col - 2));
+            }
+        }
+    }
     static void Rook_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
         // Rook can move horizontally (left and right) and vertically (up and down)
         std::vector<std::vector<char>> board = b.Get_board();
@@ -85,9 +173,13 @@ private:
             upper = 'z';
             lower = 'a';
         }
-        int c_row = row++;
+        int c_row = row;
         // right down diagonal
         for (int i = col + 1; i < 8; i++) {
+            if (c_row >= 1)
+                c_row--;
+            else
+                break;
             if (board[c_row][i] == ' ') {
                 res.push_back(std::make_pair(c_row, i));
             }
@@ -98,12 +190,15 @@ private:
             else {
                 break; // Stop if there's a piece in the way
             }
-            c_row++;
         }
 
         // Check to the left up diagonal
-        c_row = row--;
+        c_row = row;
         for (int i = col - 1; i >= 0; i--) {
+            if (c_row >= 1)
+                c_row--;
+            else
+                break;
             if (board[c_row][i] == ' ') {
                 res.push_back(std::make_pair(c_row, i));
             }
@@ -114,30 +209,37 @@ private:
             else {
                 break; // Stop if there's a piece in the way
             }
-            c_row--;
         }
-
-        // Check upwards
-        for (int i = row - 1; i >= 0; i--) {
-            if (board[i][col] == ' ') {
-                res.push_back(std::make_pair(i, col));
+        // Check to the left up diagonal
+        c_row = row;
+        for (int i = col - 1; i >= 0; i--) {
+            if (c_row < 7)
+                c_row++;
+            else
+                break;
+            if (board[c_row][i] == ' ') {
+                res.push_back(std::make_pair(c_row, i));
             }
-            else if (board[i][col] > lower && board[i][col] < upper) {
-                res.push_back(std::make_pair(i, col));
+            else if (board[c_row][i] > lower && board[c_row][i] < upper) {
+                res.push_back(std::make_pair(c_row, i));
                 break;
             }
             else {
                 break; // Stop if there's a piece in the way
             }
         }
-
-        // Check downwards
-        for (int i = row + 1; i < 8; i++) {
-            if (board[i][col] == ' ') {
-                res.push_back(std::make_pair(i, col));
+        c_row = row;
+        // right down diagonal
+        for (int i = col + 1; i < 8; i++) {
+            if (c_row < 7)
+                c_row++;
+            else
+                break;
+            if (board[c_row][i] == ' ') {
+                res.push_back(std::make_pair(c_row, i));
             }
-            else if (board[i][col] > lower && board[i][col] < upper) {
-                res.push_back(std::make_pair(i, col));
+            else if (board[c_row][i] > lower && board[c_row][i] < upper) {
+                res.push_back(std::make_pair(c_row, i));
                 break;
             }
             else {
@@ -147,25 +249,6 @@ private:
     }
 
 public:
-    static bool isMoveLegal(std::vector<std::vector<char>>& board, int fromX, int fromY, int toX, int toY) {
-        // Check if the move is within the bounds of the board
-        if (fromX < 0 || fromX >= 8 || fromY < 0 || fromY >= 8 || toX < 0 || toX >= 8 || toY < 0 || toY >= 8) {
-            return false;
-        }
-
-        char piece = board[fromY][fromX];
-        char target = board[toY][toX];
-
-        // Implement your logic for checking if the move is legal
-        // You need to consider the rules for each chess piece her
-        // horse
-        // Rook
-        // Queen
-        // King
-        // Return true if the move is legal, otherwise return false
-        return false;
-    }
-
     static void getPossibleMoves(Board& b, int col, int row, std::vector<std::pair<int, int>> &res) {
 
         std::vector<std::vector<char>> board = b.Get_board();
@@ -206,7 +289,10 @@ public:
                 res.push_back(std::make_pair(row -1, col - 1));
             }
             break;
-        case 'R' || 'r':
+        case 'R':
+            Rook_moves(res, b, col, row);
+            break;
+        case 'r':
             Rook_moves(res, b, col, row);
             break;
         case 'B':
@@ -216,22 +302,27 @@ public:
             Bishop_moves(res, b, col, row);
             break;
         case 'N':
+            Knight_moves(res, b, col, row);
             break;
         case 'n':
+            Knight_moves(res, b, col, row);
             break;
         case 'Q':
+            Bishop_moves(res, b, col, row);
+            Rook_moves(res, b, col, row);
             break;
         case 'q':
+            Bishop_moves(res, b, col, row);
+            Rook_moves(res, b, col, row);
             break;
         case 'k':
+            King_moves(res, b, col, row);
             break;
         case 'K':
+            King_moves(res, b, col, row);
             break;
 
         }
-        // horse
-        // Queen
-        // King
     }
 };
 
