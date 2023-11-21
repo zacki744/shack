@@ -20,6 +20,8 @@ public:
 inline int Game::Game_2v2() {
     Board chessboard;
     Action userAction;
+    int currentPlayer = 1;  // 1 for white, -1 for black
+    bool RedyToMove = false;
 
 
     // ... (Previous code for loading textures)
@@ -49,18 +51,79 @@ inline int Game::Game_2v2() {
                 int col = mouseX / (windowSize / 8);
 
                 // If the user clicks on an empty square and has already selected a piece, set the destination square.
-                if (userAction.Get_src() != ' ')
+                if (userAction.Get_src() != ' ' && RedyToMove)
                 {
-                    userAction.setDestinationSquare(row, col, chessboard);
-                    userAction.execute(chessboard);  // Execute the move
-                    userAction = Action(); // Reset the user action for the next turn.
+                    if (RedyToMove) {
+                        // Check if the king is in check before allowing the move
+                        int kingRow, kingCol;
+                        char kingColor;
+                        if (currentPlayer == 1) {
+                            chessboard.findKing('k', kingRow, kingCol);
+                            kingColor = 'k';
+                        }
+                        else {
+                            chessboard.findKing('K', kingRow, kingCol);
+                            kingColor = 'K';
+                        }
+
+                        if (!userAction.isKingInCheck(kingRow, kingCol, kingColor, chessboard)) {
+                            // The king is not in check, allow the move
+                            userAction.setDestinationSquare(row, col, chessboard);
+                            userAction.execute(chessboard);  // Execute the move
+                            userAction = Action(); // Reset the user action for the next turn.
+                            currentPlayer = currentPlayer * -1;
+                            RedyToMove = false;
+                        }
+                        else {
+                            //simulate the action of the move
+                            if (!userAction.NextMoveInCheck(kingRow, kingCol, kingColor, chessboard, row, col))
+                            {
+                                userAction.setDestinationSquare(row, col, chessboard);
+                                userAction.execute(chessboard);  // Execute the move
+                                userAction = Action(); // Reset the user action for the next turn.
+                                currentPlayer = currentPlayer * -1;
+                                RedyToMove = false;
+                            }
+                            else 
+                            {
+                                // The king is in check, inform the player and ask them to make another move
+                                std::cout << "Illegal move! The king is in check." << std::endl;
+
+                            }
+
+                        }
+                    }
+                    window.clear();
+                    userAction.reset(); // Reset the user action for the next turn.
+                    chessboard.empty_moves();
+                    chessboard.draw(window, font);
+                    window.display();
+
                 }
-                else
+                else if (currentPlayer == 1 && !(std::isupper(chessboard.Get_board()[row][col])))
                 {
                     chessboard.empty_moves();
                     char selectedPiece = chessboard.Get_board()[row][col];
                     userAction.setPieceToMove(selectedPiece, row, col, chessboard);
                     std::cout << "src set";
+                    RedyToMove = true;
+                }
+                else if (currentPlayer == -1 && std::isupper(chessboard.Get_board()[row][col]))
+                {
+                    chessboard.empty_moves();
+                    char selectedPiece = chessboard.Get_board()[row][col];
+                    userAction.setPieceToMove(selectedPiece, row, col, chessboard);
+                    RedyToMove = true;
+                    std::cout << "src set";
+                }
+                else 
+                {
+                    userAction.reset(); // Reset the user action for the next turn.
+                    RedyToMove = false;
+                    chessboard.empty_moves();
+                    window.clear();
+                    chessboard.draw(window, font);
+                    window.display();
                 }
             }
         }

@@ -10,7 +10,7 @@ public:
     std::vector<std::pair<int, int>> setPieceToMove(int piece, int row, int col, Board& b);
 
     // Set the destination square for the piece.
-    void setDestinationSquare(int row, int col, Board& b);
+    bool setDestinationSquare(int row, int col, Board& b);
 
     // Check if an action is ready to be executed.
     bool isReady() const;
@@ -20,6 +20,14 @@ public:
 
     // return the sorse
     char Get_src();
+
+    //reset the private vars
+    void reset();
+
+    //check if king is in check
+    bool isKingInCheck(int& kingRow, int& kingCol, char kingColor, Board& b) const;
+    bool NextMoveInCheck(int& kingRow, int& kingCol, char kingColor, Board& b, int row, int col) const;
+
 
 private:
     char pieceToMove;
@@ -35,6 +43,15 @@ inline Action::Action()
     : pieceToMove(' '), startRow(-1), startCol(-1), destRow(-1), destCol(-1), ready(false)
 {
 }
+void Action::reset()
+{
+    this->pieceToMove = ' ';
+    this->startRow = -1;
+    this->startCol = -1;
+    this->destRow = -1;
+    this->destCol = -1;
+    this->ready = false;
+}
 
 inline std::vector<std::pair<int, int>> Action::setPieceToMove(int piece, int row, int col, Board& b)
 {
@@ -49,17 +66,12 @@ inline std::vector<std::pair<int, int>> Action::setPieceToMove(int piece, int ro
     return res;
 }
 
-inline void Action::setDestinationSquare(int row, int col, Board& b)
+inline bool Action::setDestinationSquare(int row, int col, Board& b)
 {
     if (this->startRow == this->destRow && this->startCol == this->destCol) {
-        this->pieceToMove = ' ';
-        this->startRow = -1;
-        this->startCol = -1;
-        this->destRow = -1;
-        this->destCol = -1;
-        this->ready = false;
+        reset();
         b.empty_moves();
-        return;
+        return false;
     }
     std::vector<std::pair<int, int>> moves = b.Get_Leagal_moves();
     for (const auto& move : moves) {
@@ -67,7 +79,7 @@ inline void Action::setDestinationSquare(int row, int col, Board& b)
             this->destRow = row;
             this->destCol = col;
             this->ready = true;
-            return; // Exit the loop and function when a valid move is found
+            return true; // Exit the loop and function when a valid move is found
         }
     }
 }
@@ -86,12 +98,6 @@ inline void Action::execute(Board& b)
     if (ready)
     {
         b.move_pice(startRow, startCol, destRow, destCol);
-        pieceToMove = ' ';
-        startRow = -1;
-        startCol = -1;
-        destRow = -1;
-        destCol = -1;
-        ready = false;
         b.empty_moves();
     }
 }
@@ -99,5 +105,60 @@ inline void Action::execute(Board& b)
 inline char Action::Get_src()
 {
     return this->pieceToMove;
+}
+
+bool Action::isKingInCheck(int& kingRow, int& kingCol, char kingColor, Board& b) const
+{
+    std::vector<std::pair<int, int>> opponentMoves;
+
+    // Find all opponent pieces on the board
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            if ((kingColor == 'K' && islower(b.Get_board()[row][col])) ||
+                (kingColor == 'k' && isupper(b.Get_board()[row][col]))) {
+                // Get possible moves for opponent's piece
+                std::vector<std::pair<int, int>> moves;
+                this->L.getPossibleMoves(b, col, row, moves);
+                opponentMoves.insert(opponentMoves.end(), moves.begin(), moves.end());
+            }
+        }
+    }
+
+    // Check if any opponent's move is targeting the king's position
+    for (const auto& move : opponentMoves) {
+        if (move.first == kingRow && move.second == kingCol) {
+            return true;  // King is in check
+        }
+    }
+
+    return false;  // King is not in check
+}
+
+inline bool Action::NextMoveInCheck(int& kingRow, int& kingCol, char kingColor, Board& b, int row, int col) const
+{
+    Board NewBoard = b;
+    NewBoard.move_pice(startRow, startCol, row, col);
+    std::vector<std::pair<int, int>> opponentMoves;
+
+    // Find all opponent pieces on the board
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            if ((kingColor == 'K' && islower(NewBoard.Get_board()[row][col])) ||
+                (kingColor == 'k' && isupper(NewBoard.Get_board()[row][col]))) {
+                // Get possible moves for opponent's piece
+                std::vector<std::pair<int, int>> moves;
+                this->L.getPossibleMoves(NewBoard, col, row, moves);
+                opponentMoves.insert(opponentMoves.end(), moves.begin(), moves.end());
+            }
+        }
+    }
+
+    // Check if any opponent's move is targeting the king's position
+    for (const auto& move : opponentMoves) {
+        if (move.first == kingRow && move.second == kingCol) {
+            return true;  // King is in check
+        }
+    }
+    return false;
 }
 

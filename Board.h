@@ -14,6 +14,8 @@ public:
     void Set_Leagal_moves(std::vector<std::pair<int, int>> res);
     void empty_moves();
     std::vector<std::pair<int, int>> Get_Leagal_moves();
+    void findKing(char kingSymbol, int& kingRow, int& kingCol) const;
+    Board& operator=(const Board& other);
 
 
 private:
@@ -41,6 +43,15 @@ Board::Board()
 
 Board::~Board()
 {
+}
+// Assignment operator
+Board& Board::operator=(const Board& other) {
+    if (this != &other) { // Check for self-assignment
+        // Assign each member variable
+        this->chessboard = other.chessboard;
+        this->Leagal_moves = other.Leagal_moves;
+    }
+    return *this;
 }
 
 inline std::vector<std::vector<char>> Board::Get_board()
@@ -121,3 +132,20 @@ inline void Board::empty_moves()
 {
     this->Leagal_moves.clear();
 }
+
+void Board::findKing(char kingSymbol, int& kingRow, int& kingCol) const {
+    kingRow = -1;
+    kingCol = -1;
+
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            if (chessboard[row][col] == kingSymbol) {
+                kingRow = row;
+                kingCol = col;
+                return;  // Exit the loop when the king is found
+            }
+        }
+    }
+}
+
+

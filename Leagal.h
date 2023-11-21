@@ -1,8 +1,68 @@
 #pragma once
-
+#include "Game.h";
 class Legal {
 private:
-    
+    static void Pawn_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
+        std::vector<std::vector<char>> board = b.Get_board();
+        int upper;
+        int lower;
+
+        // Check to the right
+        if (board[row][col] > 'a' && board[row][col] < 'z') {
+            upper = 'Z';
+            lower = 'A';
+        }
+        else {
+            upper = 'z';
+            lower = 'a';
+        }
+
+        // Define the direction of pawn movement based on color
+        int direction = (board[row][col] >= 'a' && board[row][col] <= 'z') ? -1 : 1;
+
+        // Normal pawn move (one square forward)
+        if (b.Get_board()[row + direction][col] == ' ') {
+            res.push_back(std::make_pair(row + direction, col));
+
+            // En passant (two squares forward from the starting position)
+            if ((row == 1 && direction == 1) || (row == 6 && direction == -1)) {
+                if (b.Get_board()[row + 2 * direction][col] == ' ') {
+                    res.push_back(std::make_pair(row + 2 * direction, col));
+                }
+            }
+        }
+        // Check left diagonal
+        if (col > 0 && b.Get_board()[row + direction][col - 1] >= lower && b.Get_board()[row + direction][col - 1] <= upper) {
+            res.push_back(std::make_pair(row + direction, col - 1));
+        }
+
+        // Check right diagonal
+        if (col < 7 && b.Get_board()[row + direction][col + 1] >= lower && b.Get_board()[row + direction][col + 1] <= upper) {
+            res.push_back(std::make_pair(row + direction, col + 1));
+        }
+        //// En passant capture (opponent's pawn is next to the moving pawn)
+        //if (col + 1 <= 7 && (board[row][col + 1] > lower && board[row][col + 1] < upper)) {
+        //    // Check if there's an opponent's pawn next to the moving pawn
+        //    if (board[row][col + 1] == 'P' || board[row][col + 1] == 'p') {
+        //        // Check if the opponent's pawn moved two squares forward
+        //        if ((row == 3 && direction == -1) || (row == 4 && direction == 1)) {
+        //            res.push_back(std::make_pair(row + direction, col + 1));
+        //        }
+        //    }
+        //}
+
+        //if (col - 1 >= 0 && (board[row][col - 1] > lower && board[row][col - 1] < upper)) {
+        //    // Check if there's an opponent's pawn next to the moving pawn
+        //    if (board[row][col - 1] == 'P' || board[row][col - 1] == 'p') {
+        //        // Check if the opponent's pawn moved two squares forward
+        //        if ((row == 3 && direction == -1) || (row == 4 && direction == 1)) {
+        //            res.push_back(std::make_pair(row + direction, col - 1));
+        //        }
+        //    }
+        //}
+    }
+
+
     static void King_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
         // Rook can move horizontally (left and right) and vertically (up and down)
         std::vector<std::vector<char>> board = b.Get_board();
@@ -36,10 +96,10 @@ private:
         }
     }
     static void Knight_moves(std::vector<std::pair<int, int>>& res, Board& b, int col, int row) {
-        // Rook can move horizontally (left and right) and vertically (up and down)
         std::vector<std::vector<char>> board = b.Get_board();
         int upper;
         int lower;
+
         // Check to the right
         if (board[row][col] > 'a' && board[row][col] < 'z') {
             upper = 'Z';
@@ -49,44 +109,23 @@ private:
             upper = 'z';
             lower = 'a';
         }
-        if (row + 2 <= 7 && col + 1 <= 7) {
-            if (board[row + 2][col + 1] == ' ' || (board[row + 2][col + 1] > lower && board[row + 2][col + 1] < upper)) {
-                res.push_back(std::make_pair(row + 2, col + 1));
-            }
-        }
-        if (row + 2 <= 7 && col - 1 >= 0) {
-            if (board[row + 2][col - 1] == ' ' || (board[row + 2][col - 1] > lower && board[row + 2][col - 1] < upper)) {
-                res.push_back(std::make_pair(row + 2, col - 1));
-            }
-        }
-        if (row - 2 >= 0 && col - 1 >= 0) {
-            if (board[row - 2][col - 1] == ' ' || (board[row - 2][col - 1] > lower && board[row - 2][col - 1] < upper)) {
-                res.push_back(std::make_pair(row - 2, col - 1));
-            }
-        }
-        if (row - 2 >= 0 && col + 1 <= 7) {
-            if (board[row - 2][col + 1] == ' ' || (board[row - 2][col + 1] > lower && board[row - 2][col + 1] < upper)) {
-                res.push_back(std::make_pair(row - 2, col + 1));
-            }
-        }
-        if (row - 1 >= 0 && col + 2 <= 7) {
-            if (board[row - 1][col + 2] == ' ' || (board[row - 1][col + 2] > lower && board[row - 1][col + 2] < upper)) {
-                res.push_back(std::make_pair(row - 1, col + 2));
-            }
-        }
-        if (row + 1 <= 7 && col + 2 <= 7) {
-            if (board[row + 1][col + 2] == ' ' || (board[row + 1][col + 2] > lower && board[row + 1][col + 2] < upper)) {
-                res.push_back(std::make_pair(row + 1, col + 2));
-            }
-        }
-        if (row - 1 >= 0 && col - 2 >= 0) {
-            if (board[row - 1][col - 2] == ' ' || (board[row - 1][col - 2] > lower && board[row - 1][col - 2] < upper)) {
-                res.push_back(std::make_pair(row - 1, col - 2));
-            }
-        }
-        if (row + 1 <= 7 && col - 2 >= 0) {
-            if (board[row + 1][col - 2] == ' ' || (board[row + 1][col - 2] > lower && board[row + 1][col - 2] < upper)) {
-                res.push_back(std::make_pair(row + 1, col - 2));
+
+        // Define possible knight moves (relative to the current position)
+        int moves[8][2] = {
+            {-2, -1}, {-2, 1},
+            {-1, -2}, {-1, 2},
+            {1, -2}, {1, 2},
+            {2, -1}, {2, 1}
+        };
+
+        for (int i = 0; i < 8; i++) {
+            int newRow = row + moves[i][0];
+            int newCol = col + moves[i][1];
+
+            if (newRow >= 0 && newRow <= 7 && newCol >= 0 && newCol <= 7) {
+                if (board[newRow][newCol] == ' ' || (board[newRow][newCol] > lower && board[newRow][newCol] < upper)) {
+                    res.push_back(std::make_pair(newRow, newCol));
+                }
             }
         }
     }
@@ -261,32 +300,10 @@ public:
 
         switch (piece) {
         case 'P':
-            if (b.Get_board()[row + 1][col] == ' ') {
-                res.push_back(std::make_pair(row + 1, col));
-                if (row == 1 && b.Get_board()[row + 2][col] == ' ') {
-                    res.push_back(std::make_pair(row + 2, col));
-                }
-            }
-            if (board[row + 1][col + 1] > 'a' && board[row + 1][col + 1] < 'z') {
-                res.push_back(std::make_pair(row + 1, col + 1));
-            }
-            if (board[row + 1][col - 1] > 'a' && board[row + 1][col - 1] < 'z') {
-                res.push_back(std::make_pair(row + 1, col - 1));
-            }
+            Pawn_moves(res, b, col, row);
             break;
         case 'p':
-            if (b.Get_board()[row - 1][col] == ' ') {
-                res.push_back(std::make_pair(row - 1, col));
-                if (row == 6 && b.Get_board()[row - 2][col] == ' ') {
-                    res.push_back(std::make_pair(row - 2, col));
-                }
-            }
-            if (board[row - 1][col + 1] > 'A' && board[row - 1][col + 1] < 'Z') {
-                res.push_back(std::make_pair(row - 1, col + 1));
-            }
-            if (board[row - 1][col - 1] > 'A' && board[row - 1][col - 1] < 'Z') {
-                res.push_back(std::make_pair(row -1, col - 1));
-            }
+            Pawn_moves(res, b, col, row);
             break;
         case 'R':
             Rook_moves(res, b, col, row);
